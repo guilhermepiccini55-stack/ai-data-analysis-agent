@@ -1,0 +1,36 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribuição / empacotamento
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Variáveis de ambiente
+.env
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Artefatos gerados pela aplicação (relatórios, gráficos exportados)
+outputs/
+
+# IDEs
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Sistema operacional
+.DS_Store
