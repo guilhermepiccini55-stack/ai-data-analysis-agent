@@ -38,12 +38,15 @@ def test_limpar_retorna_dataframe_e_cleaning_report() -> None:
     assert isinstance(relatorio, CleaningReport)
 
 
-def test_visualizar_ainda_nao_implementado() -> None:
+def test_visualizar_delega_para_gerar_visualizacoes():
+    dados = pd.DataFrame({"idade": [20, 30, 40]})
+    resumo = AnalysisSummary()
+
     engine = AnalysisEngine()
 
-    with pytest.raises(NotImplementedError):
-        engine.visualizar(pd.DataFrame())
+    resultado = engine.visualizar(dados, resumo)
 
+    assert isinstance(resultado, list)
 
 def test_gerar_relatorio_ainda_nao_implementado() -> None:
     engine = AnalysisEngine()

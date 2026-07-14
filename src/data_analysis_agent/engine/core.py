@@ -17,6 +17,7 @@ from typing import Any
 
 import pandas as pd
 
+from data_analysis_agent.engine.visualization import gerar_visualizacoes
 from data_analysis_agent.engine.analysis import analisar_dados
 from data_analysis_agent.engine.cleaning import limpar_dados
 from data_analysis_agent.models.analysis_models import AnalysisResult, AnalysisSummary
@@ -92,23 +93,22 @@ class AnalysisEngine:
         """
         return analisar_dados(dados)
 
-    def visualizar(self, dados: pd.DataFrame) -> list[ChartSpec]:
+    def visualizar(
+        self,
+        dados: pd.DataFrame,
+        resumo_analise: AnalysisSummary,
+        ) -> list[ChartSpec]:
         """Executa apenas a etapa de geração de visualizações.
 
         Args:
-            dados: ``DataFrame`` a partir do qual os gráficos serão gerados.
+        dados: ``DataFrame`` a partir do qual os gráficos serão gerados.
+        resumo_analise: resultado previamente produzido pela etapa
+            de análise estatística.
 
-        Returns:
-            list[ChartSpec]: especificações dos gráficos gerados, com a
-            figura Plotly já serializada como dict.
-
-        Raises:
-            NotImplementedError: a implementação da visualização ainda não existe.
-        """
-        raise NotImplementedError(
-            "visualizar() ainda não foi implementado — "
-            "fundação da Fase 1 não inclui lógica de negócio."
-        )
+       Returns:
+        list[ChartSpec]: especificações dos gráficos gerados.
+       """
+        return gerar_visualizacoes(dados, resumo_analise)
 
     def gerar_relatorio(self, resultado: AnalysisResult) -> str:
         """Executa apenas a etapa de geração do relatório final em Markdown.
