@@ -5,10 +5,6 @@ design: nenhum método guarda estado de uma análise específica como
 atributo de instância. Cada chamada recebe os dados de que precisa como
 parâmetro e devolve um resultado completo e autossuficiente. Duas
 chamadas seguidas com entradas diferentes não interferem uma na outra.
-
-Nenhuma lógica de negócio está implementada nesta fase — todos os métodos
-expõem apenas a interface pública definida no SDD, levantando
-``NotImplementedError`` até que a implementação real seja feita.
 """
 from __future__ import annotations
 
@@ -17,11 +13,13 @@ from typing import Any
 
 import pandas as pd
 
-from data_analysis_agent.engine.visualization import gerar_visualizacoes
 from data_analysis_agent.engine.analysis import analisar_dados
 from data_analysis_agent.engine.cleaning import limpar_dados
+from data_analysis_agent.engine.report import gerar_relatorio_markdown
+from data_analysis_agent.engine.visualization import gerar_visualizacoes
 from data_analysis_agent.models.analysis_models import AnalysisResult, AnalysisSummary
 from data_analysis_agent.models.data_models import CleaningReport
+from data_analysis_agent.models.pipeline_models import ReportResult
 from data_analysis_agent.models.report_models import ChartSpec
 
 
@@ -52,16 +50,32 @@ class AnalysisEngine:
                 (ex.: CSV) a ser carregado.
 
         Returns:
-            AnalysisResult: resultado completo e autossuficiente da análise.
-
-        Raises:
-            NotImplementedError: a implementação do pipeline ainda não
-                existe nesta fase do projeto.
+            AnalysisResult: resultado completo e autossuficiente da análise,
+            já incluindo o relatório final (``relatorio``) gerado ao fim
+            do pipeline.
         """
-        raise NotImplementedError(
-            "executar_pipeline() ainda não foi implementado — "
-            "fundação da Fase 1 não inclui lógica de negócio."
+        if isinstance(dados, (str, Path)):
+            fonte_dados = str(dados)
+            dataframe = pd.read_csv(dados)
+        else:
+            fonte_dados = "DataFrame fornecido diretamente"
+            dataframe = dados
+
+        dados_limpos, relatorio_limpeza = self.limpar(dataframe)
+        resumo_analise = self.analisar(dados_limpos)
+        graficos = self.visualizar(dados_limpos, resumo_analise)
+
+        resultado_parcial = AnalysisResult(
+            fonte_dados=fonte_dados,
+            relatorio_limpeza=relatorio_limpeza,
+            resultado_analise=resumo_analise,
+            graficos=graficos,
+            relatorio=None,
         )
+
+        relatorio = self.gerar_relatorio(resultado_parcial)
+
+        return resultado_parcial.model_copy(update={"relatorio": relatorio})
 
     def limpar(self, dados: pd.DataFrame) -> tuple[pd.DataFrame, CleaningReport]:
         """Executa apenas a etapa de limpeza de dados.
@@ -87,9 +101,6 @@ class AnalysisEngine:
         Returns:
             AnalysisSummary: resumo estruturado dos resultados da análise
             estatística.
-
-        Raises:
-            NotImplementedError: a implementação da análise ainda não existe.
         """
         return analisar_dados(dados)
 
@@ -97,32 +108,28 @@ class AnalysisEngine:
         self,
         dados: pd.DataFrame,
         resumo_analise: AnalysisSummary,
-        ) -> list[ChartSpec]:
+    ) -> list[ChartSpec]:
         """Executa apenas a etapa de geração de visualizações.
 
         Args:
-        dados: ``DataFrame`` a partir do qual os gráficos serão gerados.
-        resumo_analise: resultado previamente produzido pela etapa
-            de análise estatística.
+            dados: ``DataFrame`` a partir do qual os gráficos serão gerados.
+            resumo_analise: resultado previamente produzido pela etapa
+                de análise estatística.
 
-       Returns:
-        list[ChartSpec]: especificações dos gráficos gerados.
-       """
+        Returns:
+            list[ChartSpec]: especificações dos gráficos gerados.
+        """
         return gerar_visualizacoes(dados, resumo_analise)
 
-    def gerar_relatorio(self, resultado: AnalysisResult) -> str:
+    def gerar_relatorio(self, resultado: AnalysisResult) -> ReportResult:
         """Executa apenas a etapa de geração do relatório final em Markdown.
 
         Args:
-            resultado: resultado completo de uma análise já executada.
+            resultado: resultado completo de uma análise já executada
+                (limpeza, análise e visualização), ainda sem o campo
+                ``relatorio`` preenchido.
 
         Returns:
-            str: conteúdo do relatório em formato Markdown.
-
-        Raises:
-            NotImplementedError: a implementação da geração de relatório ainda não existe.
+            ReportResult: metadados do relatório e seu conteúdo em Markdown.
         """
-        raise NotImplementedError(
-            "gerar_relatorio() ainda não foi implementado — "
-            "fundação da Fase 1 não inclui lógica de negócio."
-        )
+        return gerar_relatorio_markdown(resultado)

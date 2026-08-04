@@ -11,7 +11,8 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from data_analysis_agent.models.data_models import CleaningReport
-from data_analysis_agent.models.report_models import ChartSpec, ReportMetadata
+from data_analysis_agent.models.pipeline_models import ReportResult
+from data_analysis_agent.models.report_models import ChartSpec
 
 
 class MetodoOutlier(str, Enum):
@@ -88,8 +89,8 @@ class AnalysisResult(BaseModel):
     graficos: list[ChartSpec] = Field(
         default_factory=list, description="Especificações dos gráficos gerados."
     )
-    metadados_relatorio: ReportMetadata | None = Field(
-        default=None, description="Metadados do relatório final, se gerado."
+    relatorio: ReportResult | None = Field(
+        default=None, description="Metadados e conteúdo Markdown do relatório final, se gerado."
     )
     gerado_em: datetime = Field(
         default_factory=datetime.now, description="Momento em que o resultado foi gerado."

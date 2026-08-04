@@ -43,3 +43,7 @@ class ReportGenerationError(DataAnalysisAgentError):
 
 class EngineError(DataAnalysisAgentError):
     """Erro genérico de orquestração ocorrido na AnalysisEngine."""
+
+
+class LLMProviderError(DataAnalysisAgentError):
+    """Erro ocorrido na comunicação com um provider de LLM (Fase 2)."""

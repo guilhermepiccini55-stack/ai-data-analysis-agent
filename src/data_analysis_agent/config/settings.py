@@ -46,6 +46,17 @@ class Settings(BaseSettings):
         default=Path("data"),
         description="Diretório padrão para datasets de entrada.",
     )
+    anthropic_api_key: str | None = Field(
+        default=None,
+        description=(
+            "Chave de API da Anthropic (DAA_ANTHROPIC_API_KEY), usada pelo "
+            "AnthropicProvider na Fase 2 para gerar insights via LLM."
+        ),
+    )
+    anthropic_model: str = Field(
+        default="claude-sonnet-5",
+        description="Modelo Claude usado pelo AnthropicProvider para gerar insights.",
+    )
 
 
 def obter_settings() -> Settings:

@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 """Modelos de domínio (Pydantic) do AI Data Analysis Agent.
 
 Apenas estrutura de dados — nenhum modelo aqui contém lógica de negócio.
