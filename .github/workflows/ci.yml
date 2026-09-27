@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Instalar o projeto com dependências de desenvolvimento
+        run: pip install -e ".[dev]"
+
+      - name: Rodar testes (excluindo performance)
+        run: pytest -m "not performance"
+
+      - name: Build da imagem Docker (validação, sem publicar)
+        run: docker build -t ai-data-analysis-agent:ci .

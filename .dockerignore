@@ -1,0 +1,29 @@
+# Ambientes virtuais e cache Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Testes (não fazem parte da imagem de execução; não são copiados pelo Dockerfile)
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Controle de versão e IDEs
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Segredos e artefatos locais — nunca devem entrar na imagem
+.env
+outputs/
+data/
+
+# Build local
+build/
+dist/
+*.egg-info/
+.eggs/

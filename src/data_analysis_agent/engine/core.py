@@ -6,6 +6,7 @@ atributo de instância. Cada chamada recebe os dados de que precisa como
 parâmetro e devolve um resultado completo e autossuficiente. Duas
 chamadas seguidas com entradas diferentes não interferem uma na outra.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,6 +18,8 @@ from data_analysis_agent.engine.analysis import analisar_dados
 from data_analysis_agent.engine.cleaning import limpar_dados
 from data_analysis_agent.engine.report import gerar_relatorio_markdown
 from data_analysis_agent.engine.visualization import gerar_visualizacoes
+from data_analysis_agent.exceptions.errors import EngineError
+from data_analysis_agent.llm.base import LLMProvider
 from data_analysis_agent.models.analysis_models import AnalysisResult, AnalysisSummary
 from data_analysis_agent.models.data_models import CleaningReport
 from data_analysis_agent.models.pipeline_models import ReportResult
@@ -72,9 +75,7 @@ class AnalysisEngine:
             graficos=graficos,
             relatorio=None,
         )
-
         relatorio = self.gerar_relatorio(resultado_parcial)
-
         return resultado_parcial.model_copy(update={"relatorio": relatorio})
 
     def limpar(self, dados: pd.DataFrame) -> tuple[pd.DataFrame, CleaningReport]:
@@ -133,3 +134,13 @@ class AnalysisEngine:
             ReportResult: metadados do relatório e seu conteúdo em Markdown.
         """
         return gerar_relatorio_markdown(resultado)
+
+    def gerar_insights(self, resumo_analise: AnalysisSummary) -> str:
+        llm_provider: LLMProvider | None = self._dependencias.get("llm_provider")
+        if llm_provider is None:
+            raise EngineError(
+                "Nenhum provider de LLM foi injetado — instancie a "
+                "AnalysisEngine com AnalysisEngine(llm_provider=...) para "
+                "usar gerar_insights()."
+            )
+        return llm_provider.gerar_insights(resumo_analise.model_dump())

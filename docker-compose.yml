@@ -1,0 +1,25 @@
+# docker-compose.yml — Fase 7, Etapa 2 (AI Data Analysis Agent)
+#
+# Uma única imagem (construída a partir do Dockerfile na raiz do projeto)
+# é reutilizada pelos dois serviços. A diferença entre eles é apenas o
+# comando executado em runtime, conforme decisão da Fase 7:
+#   - api:        usa o CMD padrão da imagem (uvicorn / FastAPI, porta 8000)
+#   - streamlit:  sobrescreve o command para rodar a interface Streamlit (porta 8501)
+#
+# Sem volumes, sem banco, sem Redis, sem Nginx/reverse proxy, sem pytest no build.
+
+services:
+  api:
+    build: .
+    image: ai-data-analysis-agent:latest
+    ports:
+      - "8000:8000"
+
+  streamlit:
+    image: ai-data-analysis-agent:latest
+    ports:
+      - "8501:8501"
+    command: >
+      streamlit run src/data_analysis_agent/interfaces/streamlit_app/app.py
+      --server.address=0.0.0.0
+      --server.port=8501
